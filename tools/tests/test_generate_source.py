@@ -13,6 +13,8 @@ import sys
 import tempfile
 import unittest
 
+import yaml
+
 this_dir = pathlib.Path(__file__).parent
 tools_dir = this_dir.parent
 sys.path.insert(0, str(tools_dir))
@@ -300,6 +302,55 @@ class TestGenerateFileIntegration(unittest.TestCase):
             self.assertNotEqual(has_value, has_formula,
                                 f"Constant '{it['name']}' must define exactly one "
                                 "of 'value' or 'formula'.")
+
+    def test_e3sm_legacy_molar_masses_and_aliases_are_preserved(self):
+        _, _, _, all_items, _ = gs.load_constants(None)
+        entries = {item['name']: item['entry'] for item in all_items}
+        for element, value in [('carbon', 0.0120107), ('oxygen', 0.0159994)]:
+            with self.subTest(element=element):
+                legacy_name = f'{element}_molar_mass_e3sm_legacy'
+                self.assertEqual(entries[legacy_name]['value'], value)
+                self.assertEqual(entries[legacy_name]['reference'], 'IUPAC1997')
+                self.assertEqual(entries[f'{element}_molar_mass_reference']['formula'],
+                                 legacy_name)
+        self.assertEqual(
+            entries['carbon_dioxide_molar_mass_reference']['formula'],
+            'carbon_molar_mass_reference + 2 * oxygen_molar_mass_reference')
+
+    def test_ciaaw_abridged_molar_masses_are_separate_opt_in_values(self):
+        _, _, _, all_items, _ = gs.load_constants(None)
+        entries = {item['name']: item['entry'] for item in all_items}
+        for element, value, uncertainty in [('carbon', 0.012011, 2.0E-06),
+                                            ('oxygen', 0.015999, 1.0E-06)]:
+            with self.subTest(element=element):
+                entry = entries[f'{element}_molar_mass_ciaaw2024_abridged']
+                self.assertEqual(entry['value'], value)
+                self.assertEqual(entry['units'], 'kg mol-1')
+                self.assertEqual(entry['uncertainty'], uncertainty)
+                self.assertEqual(entry['reference'], 'CIAAW2024_abridged')
+
+    def test_conventional_values_and_si_provenance(self):
+        _, _, _, all_items, _ = gs.load_constants(None)
+        entries = {item['name']: item['entry'] for item in all_items}
+        for name, value, reference in [
+                ('standard_acceleration_of_gravity', 9.80665, 'CGPM1901'),
+            ('standard_atmosphere', 101325, 'CGPM1954')]:
+            with self.subTest(name=name):
+                self.assertEqual(entries[name]['value'], value)
+                self.assertEqual(entries[name]['reference'], reference)
+                self.assertEqual(entries[name]['uncertainty'], 'exact')
+
+    def test_all_references_resolve(self):
+        dictionary = yaml.safe_load(
+            (tools_dir.parent / 'pcd.yaml').read_text(encoding='utf-8')
+        )['physical_constants_dictionary']
+        self.assertIn('10.59161/AUEZ1291', dictionary['references']['SI2026']['citation'])
+        _, _, _, all_items, _ = gs.load_constants(None)
+        for item in all_items:
+            entry = item['entry']
+            if 'reference' in entry:
+                with self.subTest(name=item['name']):
+                    self.assertIn(entry['reference'], dictionary['references'])
 
 
 if __name__ == '__main__':

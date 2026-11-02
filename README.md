@@ -38,6 +38,39 @@ that can drift out of sync.
 
 Generated C++ headers require C++20.
 
+## Atomic-weight reference sets and provenance
+
+The existing `carbon_molar_mass_reference` and `oxygen_molar_mass_reference`
+names remain compatibility aliases for the explicitly named E3SM legacy set:
+`carbon_molar_mass_e3sm_legacy` (0.0120107 kg mol-1) and
+`oxygen_molar_mass_e3sm_legacy` (0.0159994 kg mol-1). Their historical
+`IUPAC1997` source is retained. `carbon_dioxide_molar_mass_reference` continues
+to use these legacy values; no existing numerical default changes.
+
+The separately named `carbon_molar_mass_ciaaw2024_abridged` and
+`oxygen_molar_mass_ciaaw2024_abridged` constants are opt-in model values of
+0.012011 and 0.015999 kg mol-1, respectively. They use the
+[CIAAW 2024 abridged table](https://ciaaw.org/abridged-atomic-weights.htm),
+not midpoints of the full standard atomic-weight intervals. The full
+dimensionless intervals are [12.0096, 12.0116] for carbon and
+[15.99903, 15.99977] for oxygen. These describe natural isotopic variation,
+not statistical measurement-error bars. The entries' uncertainty fields
+carry the abridged table's bounds scaled to kg mol-1, not standard uncertainties.
+
+These model molar masses use the approximate factor 0.001 kg mol-1 per unit
+atomic weight. Since the 2019 SI revision, the molar-mass constant is not
+exactly 0.001 kg mol-1; these entries are not precision determinations of
+sample-specific molar masses. Components must assess the numerical and
+scientific impact before switching references, including recomputing derived
+compound molar masses consistently. The generator does not switch sets
+automatically; both use distinct names in the same chemical group.
+
+`SI2026` cites the 2026 update of the ninth-edition SI Brochure, not a new
+edition or a change to numerical defaults. Standard gravity and the
+standard atmosphere retain their exact conventional values, with citations
+to the defining CGPM declaration (1901) and resolution (1954), rather than
+to the CODATA adjustment.
+
 The generator automatically orders every constant so that a derived
 constant's `formula` only ever references constants declared earlier in the
 generated file, regardless of the order groups/entries happen to appear in

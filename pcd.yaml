@@ -47,11 +47,26 @@ physical_constants_dictionary:
         Properties of Ordinary Water Substance for General and Scientific Use,
         J. Phys. Chem. Ref. Data, 31, 387-535, 2002.
       "
-    SI2019:
+    SI2026:
       description: "SI brochure defining units and accepted non-SI units"
       citation: "
         Bureau International des Poids et Mesures (BIPM), The International
-        System of Units (SI), 9th edition, 2019.
+        System of Units (SI), 9th edition (2019), updated 2026.
+        doi:10.59161/AUEZ1291.
+      "
+    CGPM1901:
+      description: "Conventional standard acceleration due to gravity"
+      citation: "
+        3rd CGPM (1901), Declaration 2, conventional value of standard
+        acceleration due to gravity, 980.665 cm s-2.
+        doi:10.59161/CGPM1901DECL2E.
+      "
+    CGPM1954:
+      description: "Definition of the standard atmosphere"
+      citation: "
+        10th CGPM (1954), Resolution 4, definition of the standard atmosphere
+        as 101325 newtons per square metre.
+        doi:10.59161/CGPM1954RES4E.
       "
     CGPM1948_1954:
       description: "CGPM resolutions linking the triple point and the 0.01 degree offset"
@@ -101,6 +116,17 @@ physical_constants_dictionary:
         Atomic Weights of the Elements 1997,
         Pure Appl. Chem., 71(8), 1593-1607, 1999.
         doi:10.1351/pac199971081593.
+      "
+    CIAAW2024_abridged:
+      description: "CIAAW abridged standard atomic weights 2024"
+      citation: "
+        IUPAC Commission on Isotopic Abundances and Atomic Weights (CIAAW),
+        Abridged Standard Atomic Weights 2024,
+        https://ciaaw.org/abridged-atomic-weights.htm,
+        and Standard Atomic Weights 2024,
+        https://ciaaw.org/atomic-weights.htm. Accessed 2026-11-02.
+        Based on the Atomic Weights 2021 report with 2024 revisions to
+        gadolinium, lutetium, and zirconium.
       "
     Untersteiner1961:
       description: "Arctic sea-ice mass and heat budget study"
@@ -253,10 +279,10 @@ physical_constants_dictionary:
             prec: double
             type: strict
             uncertainty: exact
-            reference: NIST_CODATA2022
+            reference: CGPM1901
             description: "
-              Nominal acceleration of an object in a vacuum at sea level at a
-              geodetic latitude of 45 degrees.
+              Conventional standard acceleration due to gravity, exactly
+              9.80665 m s-2; not a measurement of local gravity.
             "
           - name: standard_atmosphere
             value: 101325
@@ -264,9 +290,9 @@ physical_constants_dictionary:
             prec: double
             type: strict
             uncertainty: exact
-            reference: NIST_CODATA2022
+            reference: CGPM1954
             description: "
-              Unit of pressure equivalent to 760 mmHg (torr), 29.92 inches Hg and 14.696 psi.
+              Conventional pressure unit defined as exactly 101325 Pa.
             "
           - name: avogadro_constant
             value: 6.02214076E+23
@@ -339,26 +365,79 @@ physical_constants_dictionary:
     - chemical_molar_masses:
         description: "
           Reference molar masses for chemical elements and compounds used
-          across model components.
+          across model components. Existing reference names retain the E3SM
+          legacy set; CIAAW 2024 abridged values require explicit opt-in.
         "
         entries:
           - name: carbon_molar_mass_reference
+            formula: carbon_molar_mass_e3sm_legacy
+            units: kg mol-1
+            prec: double
+            type: formula
+            description: "
+              Compatibility alias for the E3SM legacy carbon molar mass.
+              Retained until components assess adoption of CIAAW 2024.
+            "
+          - name: oxygen_molar_mass_reference
+            formula: oxygen_molar_mass_e3sm_legacy
+            units: kg mol-1
+            prec: double
+            type: formula
+            description: "
+              Compatibility alias for the E3SM legacy oxygen molar mass.
+              Retained until components assess adoption of CIAAW 2024.
+            "
+          - name: carbon_molar_mass_e3sm_legacy
             value: 0.0120107
             units: kg mol-1
             prec: double
             type: strict
             reference: IUPAC1997
             description: "
-              Reference molar mass of elemental carbon.
+              E3SM legacy reference molar mass of elemental carbon, using
+              the historical IUPAC 1997 atomic weight. Not the current CIAAW set.
             "
-          - name: oxygen_molar_mass_reference
+          - name: oxygen_molar_mass_e3sm_legacy
             value: 0.0159994
             units: kg mol-1
             prec: double
             type: strict
             reference: IUPAC1997
             description: "
-              Reference molar mass of elemental oxygen.
+              E3SM legacy reference molar mass of elemental oxygen, using
+              the historical IUPAC 1997 atomic weight. Not the current CIAAW set.
+            "
+          - name: carbon_molar_mass_ciaaw2024_abridged
+            value: 0.012011
+            units: kg mol-1
+            prec: double
+            type: strict
+            uncertainty: 2.0E-06
+            reference: CIAAW2024_abridged
+            description: "
+              Opt-in model molar mass using the CIAAW 2024 abridged atomic
+              weight 12.011 +/- 0.002 and the approximate molar-mass factor
+              0.001 kg mol-1. The full dimensionless standard atomic-weight
+              interval is [12.0096, 12.0116], reflecting natural isotopic
+              variation, not a statistical measurement-error interval.
+              The stated uncertainty follows the abridged table, not a
+              standard uncertainty or the uncertainty of the molar-mass factor.
+            "
+          - name: oxygen_molar_mass_ciaaw2024_abridged
+            value: 0.015999
+            units: kg mol-1
+            prec: double
+            type: strict
+            uncertainty: 1.0E-06
+            reference: CIAAW2024_abridged
+            description: "
+              Opt-in model molar mass using the CIAAW 2024 abridged atomic
+              weight 15.999 +/- 0.001 and the approximate molar-mass factor
+              0.001 kg mol-1. The full dimensionless standard atomic-weight
+              interval is [15.99903, 15.99977], reflecting natural isotopic
+              variation, not a statistical measurement-error interval.
+              The stated uncertainty follows the abridged table, not a
+              standard uncertainty or the uncertainty of the molar-mass factor.
             "
           - name: carbon_dioxide_molar_mass_reference
             formula: carbon_molar_mass_reference + 2 * oxygen_molar_mass_reference
@@ -366,8 +445,9 @@ physical_constants_dictionary:
             prec: double
             type: formula
             description: "
-              Derived from IUPAC standard atomic weights as
+              E3SM legacy carbon dioxide molar mass, derived as
               carbon_molar_mass_reference + 2*oxygen_molar_mass_reference.
+              Does not adopt the opt-in CIAAW 2024 abridged values.
             "
     - earth_physical:
         description: "
